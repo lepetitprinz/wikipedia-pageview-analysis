@@ -1,0 +1,36 @@
+server:
+  workers: 3
+coordinator:
+  tolerations:
+  - key: "platform"
+    operator: "Equal"
+    value: "trino"
+    effect: "NoSchedule"
+worker:
+  tolerations:
+  - key: "platform"
+    operator: "Equal"
+    value: "trino"
+    effect: "NoSchedule"
+additionalCatalogs:
+  postgresql: |
+    connector.name: postgresql
+    connection-url: jdbc:postgresql://172.24.0.4:5432/trino
+    connection-user: postgres
+    connection-password: postgres
+  minio: |
+    connector.name=hive
+    hive.metastore=file
+    hive.metastore.catalog.dir=s3a://catalog/trino/
+
+    hive.recursive-directories=true
+    hive.non-managed-table-writes-enabled=true
+    hive.allow-drop-table=true
+
+    hive.s3.path-style-access=true
+    hive.s3.ssl.enabled=false
+    hive.s3select-pushdown.enabled=true
+
+    hive.s3.aws-access-key=accesskey
+    hive.s3.aws-secret-key=secretkey
+    hive.s3.endpoint=http://minio:9000

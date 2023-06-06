@@ -1,0 +1,60 @@
+version: "3"
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_DATABASE: metastore_db
+
+  # make sure that you specify correct volume to be mounted
+  minio:
+    image: minio/minio
+    container_name: minio
+    command: server --address ":9000" --console-address ":9001" /data
+    environment:
+      - MINIO_ACCESS_KEY=accesskey
+      - MINIO_SECRET_KEY=secretkey
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - ./data:/data   
+
+  createbuckets:
+    image: minio/mc
+    container_name: createbuckets
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 accesskey secretkey;
+      /usr/bin/mc mb myminio/catalog;
+      /usr/bin/mc mb myminio/spark;
+      /usr/bin/mc policy set public myminio/catalog;
+      /usr/bin/mc policy set public myminio/spark;
+      exit 0;
+      "
+
+  hive-metastore:
+    build: 
+      context: .
+      dockerfile: docker/Dockerfile
+    image: hive-metastore:latest
+    container_name: hive-metastore
+    ports:
+    - 9083:9083
+    networks:
+      default:
+        ipv4_address: 172.28.0.4
+    depends_on:
+      - mysql
+
+networks:
+  default:
+    external: true
+    name: hive-metastore

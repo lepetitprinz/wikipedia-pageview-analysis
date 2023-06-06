@@ -1,0 +1,14 @@
+server:
+  workers: 3
+coordinator:
+  tolerations:
+  - key: "platform"
+    operator: "Equal"
+    value: "trino"
+    effect: "NoSchedule"
+worker:
+  tolerations:
+  - key: "platform"
+    operator: "Equal"
+    value: "trino"
+    effect: "NoSchedule"
