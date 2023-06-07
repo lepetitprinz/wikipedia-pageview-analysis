@@ -29,12 +29,26 @@ kubectl taint nodes wiki-cluster-worker9 platform=trino:NoSchedule
 # Apache Airflow
 kubectl create ns airflow
 
+# Extending airflow image
+# build the airflow extended image
+docker build --no-cache --tag airflow-image:0.0.1 kubernetes/airflow/.
+
+# Load the airflow extended image into kind
+kind load docker-image airflow-image:0.0.1 -n wiki-cluster
+
+# Create the secret for using gitsync
+kubectl create secret generic airflow-ssh-secret \
+--from-file=gitSshKey=/Users/yjkim-studio/.ssh/id_rsa \
+-n airflow
+
 # Install airflow Helm
 helm repo add apache-airflow https://airflow.apache.org
 helm repo update
 helm search repo airflow
 helm install -f kubernetes/airflow/conf/values.yaml airflow apache-airflow/airflow \
---namespace airflow
+--namespace airflow \
+--set images.airflow.repository=airflow-image \
+--set images.airflow.tag=0.0.1
 
 # Apply apache airflow variables
 kubectl apply -f kubernetes/airflow/conf/variables.yaml
