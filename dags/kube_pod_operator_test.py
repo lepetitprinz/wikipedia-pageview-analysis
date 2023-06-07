@@ -11,7 +11,7 @@ task_default_args = {
     'owner': 'admin',
     'retries': 3,
     'retry_delay': timedelta(minutes=5),
-    'start_date': datetime(2020, 11, 21),
+    'start_date': datetime(2023, 1, 1),
     'depends_on_past': False,
     'email': ['admin@example.com'],
     'email_on_retry': False,
