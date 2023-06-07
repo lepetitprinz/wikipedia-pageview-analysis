@@ -1,8 +1,10 @@
-from urllib import request
+import gzip
+import shutil
 import argparse
+from urllib import request
 from datetime import datetime
 
-def parse_variable():
+def _parse_variable():
     parser = argparse.ArgumentParser()
     parser.add_argument('--context_variable', type=str)
     args = parser.parse_args()
@@ -17,8 +19,14 @@ def get_data(variables):
         "https://dumps.wikimedia.org/other/pageviews/"
         f"{year}/{year}-{month:0>2}/pageviews-{year}{month:0>2}{day:0>2}-{hour:0>2}0000.gz"
     )
-    request.urlretrieve(url, "/mnt/output/wikipageviews.gz")
+
+    zip_path = "/mnt/output/wikipageviews.gz"
+    file_path = "/mnt/output/wikipageviews"
+    request.urlretrieve(url, zip_path)
+    with gzip.open(zip_path, 'rb') as f_in:
+        with open(file_path, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
 
 if __name__ == "__main__":
-    variables = parse_variable()
-    app.get_data(variables)
+    variables = _parse_variable()
+    get_data(variables)
