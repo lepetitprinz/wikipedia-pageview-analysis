@@ -40,26 +40,29 @@ resources = k8s.V1ResourceRequirements(
     requests={"memory": "500Mi", "cpu": "0.5"},
 )
 
-configmaps = [
-    k8s.V1EnvFromSource(config_map_ref=k8s.V1ConfigMapEnvSource(name='secret')),
+env_from = [
+    k8s.V1EnvFromSource(
+        config_map_ref=k8s.V1ConfigMapEnvSource(name='secret')),
 ]
 
 start = DummyOperator(task_id="start", dag=dag)
 
 run = KubernetesPodOperator(
     task_id="kubernetes-pod-operator",
-    name="job", 
+    name="example", 
     namespace='airflow',
-    image='airflow-image:0.0.1',
-    secrets=[
-        env
-    ],
-    #image_pull_secrets=[k8s.V1LocalObjectReference('image_credential')],
+    cmd=["bash", "-cx"],
+    arguments=["echo", "10"],
+    service_account_name="default"
     is_delete_operator_pod=True,
+    image='debian',
+    image_pull_policy="IfNotPresent",
+    secrets=[env],
     get_logs=True,
     container_resources=resources,
-    env_from=configmaps,
+    env_from=env_from,
     dag=dag,
+    do_xcom_push=True,
 )
 
 start >> run
