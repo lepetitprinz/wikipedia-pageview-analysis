@@ -48,9 +48,6 @@ services:
     container_name: hive-metastore
     ports:
     - 9083:9083
-    networks:
-      default:
-        ipv4_address: 172.28.0.4
     depends_on:
       - mysql
 
