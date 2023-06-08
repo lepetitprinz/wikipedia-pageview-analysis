@@ -72,13 +72,14 @@ data_volume_mount = k8s.V1VolumeMount(
 
 ingest_data = KubernetesPodOperator(
     task_id="ingest_wiki_pageview",
-    image="python-image",
+    image="download-wiki",
     name="get_wiki_pageview",
     namespace="airflow",
     volumes=[volume],
     volume_mounts=[data_volume_mount, log_volume_mount],
-    cmds=["python3"],
-    arguments=["/opt/airflow/scripts/download_wiki_pageview.py", "--context_variable", '{{ ts }}'],
+    env_vars= {
+        'EXECUTE_DATE': '{{ ts }}'
+    },
     in_cluster=True,
     is_delete_operator_pod=True,
     execution_timeout=timedelta(minutes=10),
