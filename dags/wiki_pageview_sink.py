@@ -1,10 +1,8 @@
 from datetime import timedelta
-from urllib import request
 
 import airflow.utils.dates
 from airflow import DAG
-from airflow.operators.bash import BashOperator
-from airflow.providers.postgres.operators.postgres import PostgresOperator
+from kubernetes.client import models as k8s
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 
 default_args = {
@@ -23,21 +21,27 @@ dag = DAG(
     default_args=default_args
 )
 
+volume = k8s.V1Volume(
+    name="wiki-volume",
+    persistent_volume_claim=k8s.V1PersistentVolumeClaimVolumeSource(
+        claim_name="wiki-pvc"
+    )
+)
+
+volume_mount = k8s.V1VolumeMount(
+    name="wiki-volume",
+    mount_path="/mnt/data",
+    sub_path=None,
+    read_only=False
+)
+
 ingest_data = KubernetesPodOperator(
     task_id="ingest_wiki_pageview",
     image="python",
     name="get_wiki_pageview",
     namespace="airflow",
-    volumes=[{
-        'name': 'wiki-volume',
-        'persistentVolumeClaim': {
-            'claimName': 'wiki-pvc'
-        }
-    }],
-    volume_mounts=[{
-        'mountPath': '/mnt/output',
-        'name': 'wiki-volume'
-    }],
+    volumes=[volume],
+    volume_mounts=[volume_mount],
     cmds=["python3"],
     arguments=["download_wiki_pageview.py", "--context_variable", '{{ ts }}'],
     in_cluster=True,
@@ -49,27 +53,18 @@ ingest_data = KubernetesPodOperator(
     dag=dag,
 )
 
-
 fetch_data = KubernetesPodOperator(
     task_id="fetch_wiki_pageview",
     image="python",
     name="fetch_wiki_pageview",
     namespace="airflow",
-    volumes=[{
-        'name': 'wiki-volume',
-        'persistentVolumeClaim': {
-            'claimName': 'wiki-pvc'
-        }
-    }],
-    volume_mounts=[{
-        'mountPath': '/mnt/input',
-        'name': 'wiki-volume'
-    }],
+    volumes=[volume],
+    volume_mounts=[volume_mount],
     cmds=["python3"],
     arguments=["fetch_wiki_pageview.py", "--context_variable", '{{ ts }}'],
     in_cluster=True,
     is_delete_operator_pod=True,
-    execution_timeout=timedelta(minutes=5),
+    execution_timeout=timedelta(minutes=30),
     retries=1,
     image_pull_policy='IfNotPresent',
     service_account_name='airflow',
