@@ -94,7 +94,6 @@ ingest_data = KubernetesPodOperator(
 save_logs_task = PythonOperator(
     task_id='save_logs_to_minio',
     python_callable=save_logs_to_minio,
-    get_logs=True,
     dag=dag
 )
 
