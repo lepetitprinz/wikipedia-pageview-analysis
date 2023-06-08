@@ -15,7 +15,7 @@ default_args = {
 }
 
 dag = DAG(
-    dag_id="wikipedia_pageview_data_sink",
+    dag_id="wikipedia_pageview_data_ingest",
     start_date=airflow.utils.dates.days_ago(1),
     schedule_interval="@hourly",
     default_args=default_args
