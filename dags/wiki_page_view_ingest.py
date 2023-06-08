@@ -22,15 +22,15 @@ dag = DAG(
 )
 
 volume = k8s.V1Volume(
-    name="wiki-volume",
+    name="wiki-airflow-volume",
     persistent_volume_claim=k8s.V1PersistentVolumeClaimVolumeSource(
-        claim_name="wiki-pvc"
+        claim_name="wiki-airflow-pvc"
     )
 )
 
 volume_mount = k8s.V1VolumeMount(
-    name="wiki-volume",
-    mount_path="/mnt/data",
+    name="wiki-airflow-volume",
+    mount_path="/mnt/airflow/data",
     sub_path=None,
     read_only=False
 )
@@ -43,7 +43,7 @@ ingest_data = KubernetesPodOperator(
     volumes=[volume],
     volume_mounts=[volume_mount],
     cmds=["python3"],
-    arguments=["download_wiki_pageview.py", "--context_variable", '{{ ts }}'],
+    arguments=["/opt/airflow/scripts/download_wiki_pageview.py", "--context_variable", '{{ ts }}'],
     in_cluster=True,
     is_delete_operator_pod=True,
     execution_timeout=timedelta(minutes=10),
