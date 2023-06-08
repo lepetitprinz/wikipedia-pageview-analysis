@@ -18,7 +18,7 @@ default_args = {
 }
 
 dag = DAG(
-    dag_id="wikipedia_pageview_data_sink",
+    dag_id="wikipedia_pageview_data_ingest",
     start_date=airflow.utils.dates.days_ago(1),
     schedule_interval="@daily",
     default_args=default_args
@@ -68,6 +68,7 @@ log_volume_mount = k8s.V1VolumeMount(
 data_volume_mount = k8s.V1VolumeMount(
     name="wiki-airflow-volume",
     mount_path="/mnt/airflow/data",
+    sub_path=None,
     read_only=False
 )
 
@@ -90,25 +91,6 @@ ingest_data = KubernetesPodOperator(
     dag=dag,
 )
 
-fetch_data = KubernetesPodOperator(
-    task_id="fetch_wiki_pageview",
-    image="python",
-    name="fetch_wiki_pageview",
-    namespace="airflow",
-    volumes=[volume],
-    volume_mounts=[volume_mount],
-    cmds=["python3"],
-    arguments=["/opt/airflow/scripts/fetch_wiki_pageview.py", "--context_variable", '{{ ts }}'],
-    in_cluster=True,
-    is_delete_operator_pod=True,
-    execution_timeout=timedelta(minutes=30),
-    retries=1,
-    image_pull_policy='IfNotPresent',
-    service_account_name='airflow',
-    get_logs=True,
-    dag=dag,
-)
-
 save_logs_task = PythonOperator(
     task_id='save_logs_to_minio',
     python_callable=save_logs_to_minio,
@@ -116,4 +98,4 @@ save_logs_task = PythonOperator(
     dag=dag
 )
 
-ingest_data >> fetch_data >> save_logs_task
+ingest_data >> save_logs_task
