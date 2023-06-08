@@ -1,6 +1,7 @@
 import gzip
 import shutil
 import argparse
+import logging
 from urllib import request
 from datetime import datetime
 
@@ -28,5 +29,14 @@ def get_data(variables):
             shutil.copyfileobj(f_in, f_out)
 
 if __name__ == "__main__":
+    # Configure logging to write to the log file
+    logging.basicConfig(
+        filename='/logs/my_task.log',
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s'
+    )
+
+    logging.info('This is a python log message')
+
     variables = _parse_variable()
     get_data(variables)
