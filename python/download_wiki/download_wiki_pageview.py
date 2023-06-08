@@ -1,20 +1,13 @@
+import os
 import gzip
 import shutil
-import argparse
 import logging
 from urllib import request
 from datetime import datetime
 
-def _parse_variable():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--context_variable', type=str)
-    args = parser.parse_args()
 
-    return args.context_variable
-
-
-def get_data(variables):
-    time = datetime.strptime(variables, "%Y-%m-%dT%H:%M:%S%z")
+def get_data(context):
+    time = datetime.strptime(context, "%Y-%m-%dT%H:%M:%S%z")
     year, month, day, hour, *_ = time.timetuple()
     url = (
         "https://dumps.wikimedia.org/other/pageviews/"
@@ -38,5 +31,6 @@ if __name__ == "__main__":
 
     logging.info('This is a python log message')
 
-    variables = _parse_variable()
-    get_data(variables)
+    execute_date = os.environ.get('EXECUTE_DATE')
+
+    get_data(context=execute_date)
