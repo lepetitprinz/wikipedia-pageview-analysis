@@ -52,23 +52,21 @@ def save_logs_to_minio():
         )
 
 volume = k8s.V1Volume(
-    name="wiki-airflow-volume",
+    name="airflow-data-volume",
     persistent_volume_claim=k8s.V1PersistentVolumeClaimVolumeSource(
-        claim_name="wiki-airflow-pvc"
+        claim_name="airflow-data-pvc"
     )
 )
 
 log_volume_mount = k8s.V1VolumeMount(
-    name="wiki-log-volume",
+    name="airflow-log-volume",
     mount_path="/log",
-    sub_path=None,
     read_only=False
 )
 
 data_volume_mount = k8s.V1VolumeMount(
-    name="wiki-airflow-volume",
+    name="airflow-data-volume",
     mount_path="/mnt/airflow/data",
-    sub_path=None,
     read_only=False
 )
 
