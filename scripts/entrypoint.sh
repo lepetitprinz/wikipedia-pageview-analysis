@@ -45,7 +45,7 @@ kubectl create secret generic airflow-ssh-secret \
 --from-file=gitSshKey=/Users/yjkim-studio/.ssh/id_rsa \
 -n airflow
 
-# Install airflow Helm
+# Install airflow helm chart
 helm repo add apache-airflow https://airflow.apache.org
 helm repo update
 helm search repo airflow
@@ -90,7 +90,6 @@ docker network create --gateway 172.24.0.1 --subnet 172.24.0.0/21 postgres
 docker pull postgres:14.8
 docker run --name postgres \
 --network postgres \
---ip 172.24.0.4 \
 -p 5432:5432 \
 -e POSTGRES_PASSWORD=postgres \
 -v "${REPO_DIR}/docker/postgresql/data":/var/lib/postgresql/data \
