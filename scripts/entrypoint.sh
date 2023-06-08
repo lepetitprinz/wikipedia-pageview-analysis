@@ -10,12 +10,12 @@ cd ${REPO_DIR}
 
 # Application on Kubernetes 
 
-# Create kind cluster on kubernetes
+# Create the kind cluster on kubernetes
 kind create cluster --name wiki-cluster \
 --image kindest/node:v1.27.0 \
 --config kind/conf/cluster-config.yaml
 
-# Taint nodes on wiki cluster
+# Taint nodes on wiki-cluster
 kubectl taint nodes wiki-cluster-worker platform=airflow:NoSchedule
 kubectl taint nodes wiki-cluster-worker2 platform=spark:NoSchedule
 kubectl taint nodes wiki-cluster-worker3 platform=spark:NoSchedule
@@ -26,8 +26,12 @@ kubectl taint nodes wiki-cluster-worker7 platform=trino:NoSchedule
 kubectl taint nodes wiki-cluster-worker8 platform=trino:NoSchedule
 kubectl taint nodes wiki-cluster-worker9 platform=trino:NoSchedule
 
+
 # Apache Airflow
 kubectl create ns airflow
+
+# Create the persistent volume and claim used in airflow
+kubectl apply -f kubernetes/conf/airflow_pvc.yaml
 
 # Extending airflow image
 # build the airflow extended image
