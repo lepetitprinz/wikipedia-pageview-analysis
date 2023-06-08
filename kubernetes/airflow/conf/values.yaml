@@ -741,13 +741,8 @@ scheduler:
   #     - name: my-templated-extra-volume
   #       mountPath: "{{ .Values.my_custom_path }}"
   #       readOnly: true
-  extraVolumes:
-    - name: dags
-      hostPath:
-        path: "/Users/yjkim-studio/src/project/wikipedia-pageview-analysis/dags"
-  extraVolumeMounts:
-    - name: dags
-      mountPath: /opt/airflow/dags
+  extraVolumes: []
+  extraVolumeMounts: []
 
   # Select certain nodes for airflow scheduler pods.
   nodeSelector: {}
