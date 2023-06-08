@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: wiki-airflow-volume
+spec:
+  storageClassName: standard
+  claimRef:
+    name: wiki-airflow-pvc
+    namespace: airflow
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  local:
+    path: "/mnt/airflow/data"
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - wiki-cluster-worker
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wiki-airflow-pvc
+  namespace: airflow
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
