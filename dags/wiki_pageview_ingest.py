@@ -14,7 +14,7 @@ default_args = {
     "retries": 3,
     "retry_delay": timedelta(minutes=5),
     "max_active_runs": 1,
-    "template_searchpath": "/opt/python"  # Path to search for sql file
+    # "template_searchpath": "/opt/python"  # Path to search for sql file
 }
 
 dag = DAG(
