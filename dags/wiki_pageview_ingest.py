@@ -73,7 +73,7 @@ log_volume_mount = k8s.V1VolumeMount(
 
 data_volume_mount = k8s.V1VolumeMount(
     name="airflow-data-volume",
-    mount_path="/mnt/airflow",
+    mount_path="/tmp",
     read_only=False
 )
 
