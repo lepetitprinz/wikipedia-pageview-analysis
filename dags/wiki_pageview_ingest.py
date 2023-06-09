@@ -89,6 +89,7 @@ ingest_data = KubernetesPodOperator(
     },
     in_cluster=True,
     is_delete_operator_pod=True,
+    startup_timeout_seconds=600,
     execution_timeout=timedelta(minutes=10),
     retries=2,
     image_pull_policy='IfNotPresent',
