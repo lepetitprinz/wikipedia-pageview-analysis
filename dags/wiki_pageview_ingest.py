@@ -50,8 +50,15 @@ def save_logs_to_minio():
         'logs/wiki_ingest_task.log',
         log_content        
         )
+    
+log_volume = k8s.V1Volume(
+    name="airflow-log-volume",
+    persistent_volume_claim=k8s.V1PersistentVolumeClaimVolumeSource(
+        claim_name="airflow-log-pvc"
+    )
+)
 
-volume = k8s.V1Volume(
+data_volume = k8s.V1Volume(
     name="airflow-data-volume",
     persistent_volume_claim=k8s.V1PersistentVolumeClaimVolumeSource(
         claim_name="airflow-data-pvc"
@@ -75,7 +82,7 @@ ingest_data = KubernetesPodOperator(
     image="download-wiki",
     name="get_wiki_pageview",
     namespace="airflow",
-    volumes=[volume],
+    volumes=[data_volume, log_volume],
     volume_mounts=[data_volume_mount, log_volume_mount],
     env_vars= {
         'EXECUTE_DATE': '{{ ts }}'
