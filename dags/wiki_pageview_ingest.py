@@ -79,7 +79,7 @@ data_volume_mount = k8s.V1VolumeMount(
 
 ingest_data = KubernetesPodOperator(
     task_id="ingest_wiki_pageview",
-    image="download-wiki",
+    image="download-wiki:0.0.1",
     name="get_wiki_pageview",
     namespace="airflow",
     volumes=[data_volume, log_volume],
