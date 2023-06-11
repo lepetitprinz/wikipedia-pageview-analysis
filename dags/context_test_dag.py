@@ -44,7 +44,7 @@ context_data = KubernetesPodOperator(
     volumes=[log_volume],
     volume_mounts=[log_volume_mount],
     env_vars= {
-        "EXECUTE_DATE": "{{ macros.datetime.strftime(execution_date | ts, '%Y%m%d%H') }}"
+        "EXECUTE_DATE": "{{ ts_nodash }}"
     },
     in_cluster=True,
     is_delete_operator_pod=True,
