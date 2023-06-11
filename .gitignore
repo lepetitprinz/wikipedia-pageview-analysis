@@ -1,3 +1,4 @@
 .DS_Store
 docker/minio/data/
+docker/postgresql/data/
 *.meta
