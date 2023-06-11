@@ -1,19 +1,16 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: airflow-data-volume
+  name: airflow-log-volume
 spec:
   storageClassName: standard
-  claimRef:
-    name: airflow-data-pvc
-    namespace: airflow
   capacity:
-    storage: 10Gi
+    storage: 5Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   local:
-    path: "/mnt"
+    path: "/log"
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -26,12 +23,12 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: airflow-data-pvc
+  name: airflow-log-pvc
   namespace: airflow
 spec:
   storageClassName: standard
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
-      storage: 10Gi
+      storage: 5Gi

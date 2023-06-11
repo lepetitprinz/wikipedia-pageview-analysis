@@ -22,16 +22,3 @@ spec:
           operator: In
           values:
           - wiki-cluster-worker
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: airflow-data-pvc
-  namespace: airflow
-spec:
-  storageClassName: standard
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 10Gi
