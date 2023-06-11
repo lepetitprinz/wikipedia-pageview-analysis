@@ -34,6 +34,8 @@ log_volume_mount = k8s.V1VolumeMount(
     read_only=False
 )
 
+# env_vars = [k8s.V1EnvVar(name=name, value=value, value_from=value_from) for name, value, value_from in '{{ ts }}']
+
 context_data = KubernetesPodOperator(
     task_id="context_test",
     image="context-test:0.0.1",
@@ -42,7 +44,7 @@ context_data = KubernetesPodOperator(
     volumes=[log_volume],
     volume_mounts=[log_volume_mount],
     env_vars= {
-        'EXECUTE_DATE': '{{ ts }}'
+        "EXECUTE_DATE": "{{ macros.datetime.strftime(ts, '%Y%m%d%H') }}"
     },
     in_cluster=True,
     is_delete_operator_pod=True,
