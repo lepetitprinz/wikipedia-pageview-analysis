@@ -31,7 +31,7 @@ kubectl taint nodes wiki-cluster-worker9 platform=trino:NoSchedule
 kubectl create ns airflow
 
 # Create the persistent volume and claim used in airflow
-kubectl apply -f kubernetes/conf/airflow_pvc.yaml
+kubectl apply -f kubernetes/conf/airflow_log_pv_pvc.yaml
 
 # Extending airflow image
 # build the airflow extended image
