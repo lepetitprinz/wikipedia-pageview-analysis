@@ -2,16 +2,16 @@ import os
 import time
 import gzip
 import shutil
-from datetime import date, timedelta
+from datetime import timedelta, date
 from urllib import request
 
 
 def calc_datetime(execute_time: str):
-    date, time = execute_time.split("T")
-    year, month, day = date[:4], date[4:6], date[6:]
-    yesterday = date(year=year, month=month) - timedelta(days=1)
+    days, times = execute_time.split("T")
+    year, month, day = days[:4], days[4:6], days[6:]
+    yesterday = date(year=int(year), month=int(month), day=int(day)) - timedelta(days=1)
     year, month, day, *_ = yesterday.timetuple()
-    hour = time[:2]
+    hour = times[:2]
 
     print(f"Execution Timestamp: {year}-{month}-{day} {hour}H")
 
@@ -44,7 +44,7 @@ def get_data(execute_date: str) -> None:
 
     print("Unzipping the wiki pageviews is finished.")
     
-    time.sleep(30)
+    time.sleep(10)
 
 if __name__ == "__main__":
     execute_date = os.environ.get('EXECUTE_DATE', "None")
