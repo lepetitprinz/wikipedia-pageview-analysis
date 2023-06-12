@@ -9,13 +9,15 @@ from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import Kubernete
 default_args = {
     "owner": "yjkim",
     "depends_on_past": False,
-    "retries": 3,
+    "retries": 1,
     "retry_delay": timedelta(minutes=5),
+    "concurrency": 1,
+    "max_active_tasks": 1, 
     "max_active_runs": 1,
 }
 
 dag = DAG(
-    dag_id="wikipedia_pageview_ingest_sink_data",
+    dag_id="wikipedia_pageview_ingest_sink",
     start_date=airflow.utils.dates.days_ago(1),
     schedule_interval="@daily",
     default_args=default_args
@@ -75,6 +77,9 @@ sink_data = KubernetesPodOperator(
     namespace="airflow",
     volumes=[data_volume, log_volume],
     volume_mounts=[data_volume_mount, log_volume_mount],
+        env_vars= {
+        "EXECUTE_DATE": "{{ ts_nodash }}"
+    },
     in_cluster=True,
     is_delete_operator_pod=True,
     startup_timeout_seconds=300,
