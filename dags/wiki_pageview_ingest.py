@@ -9,13 +9,15 @@ from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import Kubernete
 default_args = {
     "owner": "yjkim",
     "depends_on_past": False,
-    "retries": 3,
+    "retries": 1,
     "retry_delay": timedelta(minutes=5),
+    "concurrency": 1,
+    "max_active_tasks": 1, 
     "max_active_runs": 1,
 }
 
 dag = DAG(
-    dag_id="wikipedia_pageview_ingest_data",
+    dag_id="wikipedia_pageview_ingest",
     start_date=airflow.utils.dates.days_ago(1),
     schedule_interval="@daily",
     default_args=default_args
