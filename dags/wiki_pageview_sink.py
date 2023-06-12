@@ -93,11 +93,11 @@ convert_data = KubernetesPodOperator(
     dag=dag,
 )
 
-# sink_data = PostgresOperator(
-#     task_id="sink_to_postgres",
-#     postgres_conn_id="wiki_postgres",
-#     sql="wiki_pageview.sql",
-#     dag=dag
-# )
+sink_data = PostgresOperator(
+    task_id="sink_to_postgres",
+    postgres_conn_id="wiki_postgres",
+    sql="wiki_pageview.sql",
+    dag=dag
+)
 
-ingest_data >> convert_data
+ingest_data >> convert_data >> sink_data
