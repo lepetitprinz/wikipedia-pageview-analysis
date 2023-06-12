@@ -4,6 +4,7 @@ import airflow.utils.dates
 from airflow import DAG
 from kubernetes.client import models as k8s
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
+from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 
 default_args = {
@@ -20,6 +21,7 @@ dag = DAG(
     dag_id="wikipedia_pageview_ingest_sink",
     start_date=airflow.utils.dates.days_ago(1),
     schedule_interval="@daily",
+    template_searchpath="/mnt",
     default_args=default_args
 )
     
@@ -70,10 +72,10 @@ ingest_data = KubernetesPodOperator(
     dag=dag,
 )
 
-sink_data = KubernetesPodOperator(
-    task_id="sink_wiki_pageview",
-    image="sink-wiki:0.0.1",
-    name="sink_wiki_pageview",
+convert_data = KubernetesPodOperator(
+    task_id="convert_wiki_pageview",
+    image="convert-wiki:0.0.1",
+    name="convert_wiki_pageview",
     namespace="airflow",
     volumes=[data_volume, log_volume],
     volume_mounts=[data_volume_mount, log_volume_mount],
@@ -91,4 +93,11 @@ sink_data = KubernetesPodOperator(
     dag=dag,
 )
 
-ingest_data >> sink_data
+# sink_data = PostgresOperator(
+#     task_id="sink_to_postgres",
+#     postgres_conn_id="wiki_postgres",
+#     sql="wiki_pageview.sql",
+#     dag=dag
+# )
+
+ingest_data >> convert_data
