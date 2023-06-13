@@ -4,7 +4,6 @@ import airflow.utils.dates
 from airflow import DAG
 from kubernetes.client import models as k8s
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
-from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 
 default_args = {
@@ -18,10 +17,9 @@ default_args = {
 }
 
 dag = DAG(
-    dag_id="wikipedia_pageview_ingest_sink",
+    dag_id="wikipedia_pageview_wrangling",
     start_date=airflow.utils.dates.days_ago(1),
     schedule_interval="@daily",
-    template_searchpath="/mnt",
     default_args=default_args
 )
     
@@ -79,7 +77,7 @@ convert_data = KubernetesPodOperator(
     namespace="airflow",
     volumes=[data_volume, log_volume],
     volume_mounts=[data_volume_mount, log_volume_mount],
-        env_vars= {
+    env_vars= {
         "EXECUTE_DATE": "{{ ts_nodash }}"
     },
     in_cluster=True,
@@ -93,11 +91,22 @@ convert_data = KubernetesPodOperator(
     dag=dag,
 )
 
-sink_data = PostgresOperator(
-    task_id="sink_to_postgres",
-    postgres_conn_id="wiki_postgres",
-    sql="wiki_pageview.sql",
+wrangling_data = KubernetesPodOperator(
+    task_id="wrangling_wiki_pageview",
+    image="wrangling-wiki:0.0.1",
+    name="wrangling_wiki_pageview",
+    namespace="airflow",
+    volumes=[data_volume, log_volume],
+    volume_mounts=[data_volume_mount, log_volume_mount],
+    in_cluster=True,
+    is_delete_operator_pod=True,
+    startup_timeout_seconds=300,
+    execution_timeout=timedelta(minutes=30),
+    retries=1,
+    image_pull_policy='IfNotPresent',
+    service_account_name='airflow',
+    get_logs=True,
     dag=dag,
 )
 
-ingest_data >> convert_data >> sink_data
+ingest_data >> convert_data >> wrangling_data
