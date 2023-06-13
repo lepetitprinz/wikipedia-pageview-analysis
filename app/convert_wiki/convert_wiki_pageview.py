@@ -1,16 +1,19 @@
 import os
-from typing import Dict
+import time
+from typing import List
+import pandas as pd
+import fastparquet as fp
 from datetime import date, datetime, timedelta
 
 
-def _fetch_pageview() -> Dict[str, int]:
+def _fetch_pageview() -> List[str, int]:
     # Read the file within the mounted volume
-    result = {}
+    result = []
     with open("/tmp/wikipageviews", "r") as f:
         for line in f:
             domain_code, page_title, view_counts, _ = line.split(" ")
             if domain_code == "en" and len(page_title) < 100:
-                result[page_title] = view_counts
+                result.append([page_title, view_counts])
     
     return result
 
@@ -30,19 +33,21 @@ def _calc_datetime():
 
     return execute_date, execute_time
 
-def convert_to_sql(data: Dict[str, int]) -> None:
+def convert_to_parquet(data: List[str, int]) -> None:
+    df = pd.DataFrame(data, columns=["page_title", "view_counts"])
+
     # Get the time related data
     execute_date, execute_time = _calc_datetime()
 
-    # Save pageview data to sql statement
-    with open("/tmp/wiki_pageview.sql", "w") as f:
-        for page_name, pageview_cnt in data.items():
-            f.write(
-                "INSERT INTO pageview_counts VALUES ("
-                f"'{execute_date}', '{execute_time}', '{page_name}', {pageview_cnt}"
-                ");\n"
-            )
+    # Add execute date and time columns
+    df["execute_date"] = execute_date
+    df["execute_time"] = execute_time
+
+    # Writes to parquet file
+    parquet_path = '/tmp/wiki_pageview.parquet'
+    fp.write(parquet_path, df, compression='GZIP')
 
 if __name__ == "__main__":
     pageview = _fetch_pageview()
-    convert_to_sql(data=pageview)
+    convert_to_parquet(data=pageview)
+    time.sleep(10)
