@@ -7,7 +7,7 @@ WORKDIR /app
 # COPY requirements.txt .
 # RUN pip install --no-cache-dir -r requirements.txt
 
-COPY sink_wiki_pageview.py .
+COPY convert_wiki_pageview.py .
 
 # Run the Python script
-CMD ["python", "sink_wiki_pageview.py"]
+CMD ["python", "convert_wiki_pageview.py"]
