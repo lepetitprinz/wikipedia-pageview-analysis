@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pg-conn-configmap
+data:
+  host: 172.23.0.12
+  port: 5432
+  database: wiki
+  user: postgres
+  password: postgres
