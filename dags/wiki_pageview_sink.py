@@ -95,9 +95,7 @@ convert_data = KubernetesPodOperator(
 sink_data = PostgresOperator(
     task_id="sink_to_postgres",
     postgres_conn_id="wiki_postgres",
-    sql="tmp/wiki_pageview.sql",
-    volumes=[data_volume],
-    volume_mounts=[data_volume_mount],
+    sql="mnt/wiki_pageview.sql",
     dag=dag,
 )
 
