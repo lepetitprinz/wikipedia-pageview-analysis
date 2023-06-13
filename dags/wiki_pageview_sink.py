@@ -21,7 +21,6 @@ dag = DAG(
     dag_id="wikipedia_pageview_ingest_sink",
     start_date=airflow.utils.dates.days_ago(1),
     schedule_interval="@daily",
-    template_searchpath="/mnt",
     default_args=default_args
 )
     
@@ -96,8 +95,10 @@ convert_data = KubernetesPodOperator(
 sink_data = PostgresOperator(
     task_id="sink_to_postgres",
     postgres_conn_id="wiki_postgres",
-    sql="wiki_pageview.sql",
-    dag=dag
+    sql="tmp/wiki_pageview.sql",
+    volumes=[data_volume],
+    volume_mounts=[data_volume_mount],
+    dag=dag,
 )
 
 ingest_data >> convert_data >> sink_data
