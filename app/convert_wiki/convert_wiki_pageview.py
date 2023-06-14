@@ -1,12 +1,11 @@
 import os
 import time
-from typing import List
 import pandas as pd
 import fastparquet as fp
 from datetime import date, datetime, timedelta
 
 
-def _fetch_pageview() -> List[str, int]:
+def _fetch_pageview():
     # Read the file within the mounted volume
     result = []
     with open("/tmp/wikipageviews", "r") as f:
@@ -33,7 +32,7 @@ def _calc_datetime():
 
     return execute_date, execute_time
 
-def convert_to_parquet(data: List[str, int]) -> None:
+def convert_to_parquet(data) -> None:
     df = pd.DataFrame(data, columns=["page_title", "view_counts"])
 
     # Get the time related data
