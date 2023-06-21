@@ -1,5 +1,6 @@
+import time
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, regexp_replace
+from pyspark.sql.functions import col, regexp_replace, to_date, to_timestamp
 
 
 def main(spark: SparkSession):
@@ -12,8 +13,19 @@ def main(spark: SparkSession):
         regexp_replace(col("page_title"), "[^a-zA-Z0-9\\s]", ""))
     df = df.filter(col("page_title") != "")
 
+    # Change data types
+    df = df \
+        .withColumn("view_counts", col("view_counts").cast("integer")) \
+        .withColumn("execute_date", to_date(col("execute_date"), "yyyy-MM-dd")) \
+        .withColumn("execute_time", to_timestamp(col("execute_time")))
+
+    # Filter view counts
+    df = df.filter(col("view_counts") >= 10)
+
     # Save the preprocessed dataframe
-    df.write.parquet(
+    df.write \
+    .mode(saveMode="overwrite") \
+    .parquet(
         "/tmp/wiki_pageview_wrangled.parquet",
         compression='gzip'
         )
@@ -27,3 +39,5 @@ if __name__ == '__main__':
     spark.sparkContext.setLogLevel('error')
     main(spark=spark)
     spark.stop()
+
+    time.sleep(10)
