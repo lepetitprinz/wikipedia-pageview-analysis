@@ -322,7 +322,15 @@ extraConfigMaps: {}
 # Extra env 'items' that will be added to the definition of airflow containers
 # a string is expected (can be templated).
 # TODO: difference from `env`? This is a templated string. Probably should template `env` and remove this.
-extraEnv: ~
+extraEnv: |
+    - name: AIRFLOW__WEBSERVER__EXPOSE_CONFIG
+      value: 'True'
+
+#    - name: AIRFLOW__CORE__PARALLELISM
+#      value: '1'
+#    - name: AIRFLOW__CELERY__WORKER_CONCURRENCY
+#      value: '1'
+
 # eg:
 # extraEnv: |
 #   - name: AIRFLOW__CORE__LOAD_EXAMPLES
@@ -1857,6 +1865,8 @@ config:
     # For Airflow 1.10, backward compatibility; moved to [logging] in 2.0
     colored_console_log: 'False'
     remote_logging: '{{- ternary "True" "False" .Values.elasticsearch.enabled }}'
+    max_active_runs_per_dag: 1
+    max_active_tasks_per_dag: 1
   logging:
     remote_logging: '{{- ternary "True" "False" .Values.elasticsearch.enabled }}'
     colored_console_log: 'False'
