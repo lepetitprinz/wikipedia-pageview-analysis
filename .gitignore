@@ -2,3 +2,4 @@
 docker/minio/data/
 docker/postgresql/data/
 *.meta
+*.jar
