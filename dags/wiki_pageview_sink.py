@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 import airflow.utils.dates
 from airflow import DAG
@@ -10,7 +10,7 @@ default_args = {
     "owner": "yjkim",
     "depends_on_past": False,
     "retries": 1,
-    "retry_delay": timedelta(minutes=5),
+    "retry_delay": timedelta(minutes=10),
     "concurrency": 1,
     "max_active_tasks": 1, 
     "max_active_runs": 1,
@@ -18,8 +18,9 @@ default_args = {
 
 dag = DAG(
     dag_id="wikipedia_pageview_sink",
-    start_date=airflow.utils.dates.days_ago(1),
-    schedule_interval="@daily",
+    start_date=datetime(2023, 5, 21),
+    # start_date=airflow.utils.dates.days_ago(1),
+    schedule_interval="@hourly",
     default_args=default_args
 )
     
