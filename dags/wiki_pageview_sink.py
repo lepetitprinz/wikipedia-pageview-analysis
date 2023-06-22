@@ -18,7 +18,7 @@ default_args = {
 
 dag = DAG(
     dag_id="wikipedia_pageview_sink",
-    start_date=datetime(2023, 5, 21),
+    start_date=datetime(2023, 5, 27),
     # start_date=airflow.utils.dates.days_ago(1),
     schedule_interval="@hourly",
     default_args=default_args
