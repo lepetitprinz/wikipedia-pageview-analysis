@@ -20,3 +20,24 @@ subjects:
   - kind: ServiceAccount
     name: airflow
     namespace: airflow
+  - kind: ServiceAccount
+    name: airflow-worker
+    namespace: airflow
+  - kind: ServiceAccount
+    name: airflow-scheduler
+    namespace: airflow
+  - kind: ServiceAccount
+    name: airflow-webserver
+    namespace: airflow
+  - kind: ServiceAccount
+    name: airflow-triggerer
+    namespace: airflow
+  - kind: ServiceAccount
+    name: airflow-statsd
+    namespace: airflow
+  - kind: ServiceAccount
+    name: airflow-create-user-job
+    namespace: airflow
+  - kind: ServiceAccount
+    name: default
+    namespace: airflow
